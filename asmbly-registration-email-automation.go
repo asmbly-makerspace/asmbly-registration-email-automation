@@ -1,10 +1,17 @@
 package main
 
 import (
+	"log"
+	"os"
+	"path/filepath"
+
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	// "github.com/aws/aws-cdk-go/awscdk/v2/awssqs"
+
+	"github.com/aws/aws-cdk-go/awscdk/v2/awslambda"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
+	"github.com/joho/godotenv"
 )
 
 type AsmblyRegistrationEmailAutomationStackProps struct {
@@ -18,12 +25,36 @@ func NewAsmblyRegistrationEmailAutomationStack(scope constructs.Construct, id st
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
+	// Setup the Lambda environment variables
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	lambda_env := map[string]*string{
+		"MJ_APIKEY_PRIVATE": jsii.String(os.Getenv("MJ_APIKEY_PRIVATE")),
+		"MJ_APIKEY_PUBLIC":  jsii.String(os.Getenv("MJ_APIKEY_PUBLIC")),
+	}
+
 	// The code that defines your stack goes here
 
-	// example resource
-	// queue := awssqs.NewQueue(stack, jsii.String("AsmblyRegistrationEmailAutomationQueue"), &awssqs.QueueProps{
-	// 	VisibilityTimeout: awscdk.Duration_Seconds(jsii.Number(300)),
-	// })
+	// Create a new container image
+
+	dir, _ := os.Getwd()
+
+	ecr_image := awslambda.EcrImageCode_FromAssetImage(jsii.String(filepath.Join(dir, "lambda-image")),
+		&awslambda.AssetImageCodeProps{},
+	)
+
+	// Lambda Function
+	awslambda.NewFunction(stack, jsii.String("ClassRegistrationEmails"), &awslambda.FunctionProps{
+		Code:         ecr_image,
+		Runtime:      awslambda.Runtime_FROM_IMAGE(),
+		Handler:      awslambda.Handler_FROM_IMAGE(),
+		FunctionName: jsii.String("asmblyClassEmails"),
+		Timeout:      awscdk.Duration_Seconds(jsii.Number(15)),
+		Environment:  &lambda_env,
+	})
 
 	return stack
 }
@@ -49,15 +80,15 @@ func env() *awscdk.Environment {
 	// Account/Region-dependent features and context lookups will not work, but a
 	// single synthesized template can be deployed anywhere.
 	//---------------------------------------------------------------------------
-	return nil
+	// return nil
 
 	// Uncomment if you know exactly what account and region you want to deploy
 	// the stack to. This is the recommendation for production stacks.
 	//---------------------------------------------------------------------------
-	// return &awscdk.Environment{
-	//  Account: jsii.String("123456789012"),
-	//  Region:  jsii.String("us-east-1"),
-	// }
+	return &awscdk.Environment{
+		Account: jsii.String("110104886034"),
+		Region:  jsii.String("us-east-2"),
+	}
 
 	// Uncomment to specialize this stack for the AWS Account and Region that are
 	// implied by the current CLI configuration. This is recommended for dev
