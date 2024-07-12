@@ -2,21 +2,33 @@ package mailservice
 
 // Import the Mailjet wrapper
 import (
-	"os"
-
 	"github.com/mailjet/mailjet-apiv3-go/v4"
 )
 
-type MailService interface {
+type Credentials struct {
+	PublicKey string
+	SecretKey string
+}
+
+type MailServiceInterface interface {
 	SendRegistrationEmail(className, email string) error
 }
 
-func NewClient() *mailjet.Client {
-	// Get your environment Mailjet keys and connect
-	publicKey := os.Getenv("MJ_APIKEY_PUBLIC")
-	secretKey := os.Getenv("MJ_APIKEY_PRIVATE")
+func NewClient(creds Credentials) *MailService {
 
-	mj := mailjet.NewMailjetClient(publicKey, secretKey)
+	mj := mailjet.NewMailjetClient(creds.PublicKey, creds.SecretKey)
 
-	return mj
+	mailService := &MailService{
+		client: mj,
+	}
+
+	return mailService
+}
+
+type MailService struct {
+	client *mailjet.Client
+}
+
+func (ms *MailService) SendRegistrationEmail(className, email string) error {
+	return nil
 }
