@@ -10,17 +10,16 @@ import (
 
 func lambdaHandler(ctx context.Context) error {
 	// Create the mail service
-	publicKey := os.Getenv("MJ_APIKEY_PUBLIC")
-	secretKey := os.Getenv("MJ_APIKEY_PRIVATE")
-
-	creds := mailservice.Credentials{
-		PublicKey: publicKey,
-		SecretKey: secretKey,
+	creds := mailservice.MJCredentials{
+		PublicKey: os.Getenv("MJ_APIKEY_PUBLIC"),
+		SecretKey: os.Getenv("MJ_APIKEY_PRIVATE"),
 	}
 
-	mailService := mailservice.NewClient(creds)
+	mjClient := mailservice.NewMJClient(creds)
 
-	mailService.SendRegistrationEmail("", "")
+	mailService := mailservice.NewClient(mjClient)
+
+	mailService.SendRegistrationEmail("", "", "")
 
 	return nil
 }
