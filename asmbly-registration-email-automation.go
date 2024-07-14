@@ -35,6 +35,8 @@ func NewAsmblyRegistrationEmailAutomationStack(scope constructs.Construct, id st
 	lambda_env := map[string]*string{
 		"MJ_APIKEY_PRIVATE": jsii.String(os.Getenv("MJ_APIKEY_PRIVATE")),
 		"MJ_APIKEY_PUBLIC":  jsii.String(os.Getenv("MJ_APIKEY_PUBLIC")),
+		"NEON_APIKEY":       jsii.String(os.Getenv("NEON_APIKEY")),
+		"NEON_APIUSER":      jsii.String(os.Getenv("NEON_APIUSER")),
 	}
 
 	// The code that defines your stack goes here
@@ -53,7 +55,7 @@ func NewAsmblyRegistrationEmailAutomationStack(scope constructs.Construct, id st
 		Code:         ecr_image,
 		Runtime:      awslambda.Runtime_FROM_IMAGE(),
 		Handler:      awslambda.Handler_FROM_IMAGE(),
-		FunctionName: jsii.String("asmblyClassEmails"),
+		FunctionName: jsii.String("classEmailAutomation"),
 		Timeout:      awscdk.Duration_Seconds(jsii.Number(15)),
 		Environment:  &lambda_env,
 		Architecture: awslambda.Architecture_ARM_64(),
