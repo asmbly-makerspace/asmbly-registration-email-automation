@@ -94,6 +94,10 @@ func lambdaHandler(event Event) error {
 	neonEventName := <-eventChan
 	registrantEmail := <-acctChan
 
+	if os.Getenv("DEV") == "1" && registrantEmail != os.Getenv("TEST_EMAIL") {
+		return nil
+	}
+
 	err = mailService.SendRegistrationEmail(
 		neonEventName,
 		registrantEmail,
