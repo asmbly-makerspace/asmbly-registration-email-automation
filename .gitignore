@@ -20,3 +20,6 @@ cdk.out
 
 # .env file
 .env
+
+# example json data
+*_example.json

@@ -2,6 +2,7 @@ package mailservice
 
 import (
 	"errors"
+	"log"
 
 	"github.com/mailjet/mailjet-apiv3-go/v3/resources"
 	"github.com/mailjet/mailjet-apiv3-go/v4"
@@ -20,7 +21,7 @@ type MJCredentials struct {
 
 type mailServiceInterface interface {
 	SendEmail(values EmailInfo) error
-	GetTemplateIDByName(name string) (int, error)
+	GetTemplateIDByName(name string) (count int, id int, err error)
 }
 
 type Client struct {
@@ -33,9 +34,12 @@ func NewClient(mailService mailServiceInterface) *Client {
 
 func (c *Client) SendRegistrationEmail(className, email, firstName string) error {
 
-	templateID, err := c.mailService.GetTemplateIDByName(className)
+	count, templateID, err := c.mailService.GetTemplateIDByName(className)
 	if err != nil {
 		return err
+	} else if count == 0 {
+		log.Printf("no email template found for class %q", className)
+		return nil
 	}
 
 	values := EmailInfo{
@@ -106,20 +110,20 @@ func (mj *MJMailService) SendEmail(values EmailInfo) error {
 	return nil
 }
 
-func (mj *MJMailService) GetTemplateIDByName(name string) (id int, err error) {
+func (mj *MJMailService) GetTemplateIDByName(name string) (count, id int, err error) {
 
 	var data []resources.Template
 
 	nameFilter := mailjet.Filter("Name", name)
-	count, _, err := mj.client.List("template", &data, nameFilter)
+	count, _, err = mj.client.List("template", &data, nameFilter)
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 	if count == 0 {
-		return 0, ErrNotFound
+		return count, 0, nil
 	} else if count > 1 {
-		return 0, ErrMultipleFound
+		return count, 0, ErrMultipleFound
 	}
 
-	return int(data[0].ID), nil
+	return count, int(data[0].ID), nil
 }

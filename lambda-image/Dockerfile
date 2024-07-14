@@ -9,11 +9,12 @@ ENV GOOS="linux"
 ENV GOARCH="arm64"
 
 # Cache dependencies
-ADD app.go go.mod go.sum ./
+ADD app.go go.mod go.sum lambda_events.go ./
+ADD ./mailservice ./mailservice
 RUN go mod download
 
 # Build
-RUN go build -a -o app app.go
+RUN go build -a -o app
 
 # Copy artifacts to a clean image
 FROM scratch

@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	// "github.com/aws/aws-cdk-go/awscdk/v2/awssqs"
 
+	"github.com/aws/aws-cdk-go/awscdk/v2/awsecrassets"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awslambda"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
@@ -39,21 +40,33 @@ func NewAsmblyRegistrationEmailAutomationStack(scope constructs.Construct, id st
 	// The code that defines your stack goes here
 
 	// Create a new container image
-
 	dir, _ := os.Getwd()
 
 	ecr_image := awslambda.EcrImageCode_FromAssetImage(jsii.String(filepath.Join(dir, "lambda-image")),
-		&awslambda.AssetImageCodeProps{},
+		&awslambda.AssetImageCodeProps{
+			Platform: awsecrassets.Platform_LINUX_ARM64(),
+		},
 	)
 
 	// Lambda Function
-	awslambda.NewFunction(stack, jsii.String("ClassRegistrationEmails"), &awslambda.FunctionProps{
+	fn := awslambda.NewFunction(stack, jsii.String("ClassRegistrationEmails"), &awslambda.FunctionProps{
 		Code:         ecr_image,
 		Runtime:      awslambda.Runtime_FROM_IMAGE(),
 		Handler:      awslambda.Handler_FROM_IMAGE(),
 		FunctionName: jsii.String("asmblyClassEmails"),
 		Timeout:      awscdk.Duration_Seconds(jsii.Number(15)),
 		Environment:  &lambda_env,
+		Architecture: awslambda.Architecture_ARM_64(),
+	})
+
+	// Lambda function URL endpoint
+	fnUrl := fn.AddFunctionUrl(&awslambda.FunctionUrlOptions{
+		AuthType: awslambda.FunctionUrlAuthType_NONE,
+	})
+
+	// Define a CloudFormation output for the function URL
+	awscdk.NewCfnOutput(stack, jsii.String("ClassRegistrationEmailsUrlOutput"), &awscdk.CfnOutputProps{
+		Value: fnUrl.Url(),
 	})
 
 	return stack

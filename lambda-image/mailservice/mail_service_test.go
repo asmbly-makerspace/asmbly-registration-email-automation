@@ -78,10 +78,9 @@ func TestSendRegistrationEmail(t *testing.T) {
 
 		err := mailClient.SendRegistrationEmail(className, email, firstName)
 
-		if err == nil {
-			t.Fatal("expected an error but didn't get one")
+		if err != nil {
+			t.Fatalf("sending registration email failed with error: %s", err)
 		}
-		assertError(t, err, mailservice.ErrNotFound)
 
 		got := fakeService.calls
 		want := 0
@@ -104,7 +103,7 @@ func (f *fakeMailService) SendEmail(values mailservice.EmailInfo) error {
 	return nil
 }
 
-func (f *fakeMailService) GetTemplateIDByName(name string) (id int, err error) {
+func (f *fakeMailService) GetTemplateIDByName(name string) (count, id int, err error) {
 	var found []fakeTemplateEntry
 	for _, template := range f.templateDatabase {
 		if template.Name == name {
@@ -113,12 +112,12 @@ func (f *fakeMailService) GetTemplateIDByName(name string) (id int, err error) {
 	}
 
 	if len(found) == 0 {
-		return 0, mailservice.ErrNotFound
+		return 0, 0, nil
 	} else if len(found) > 1 {
-		return 0, mailservice.ErrMultipleFound
+		return 0, 0, mailservice.ErrMultipleFound
 	}
 
-	return int(found[0].ID), nil
+	return len(found), int(found[0].ID), nil
 }
 
 type fakeTemplateEntry struct {
