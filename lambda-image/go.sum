@@ -6,8 +6,8 @@ github.com/mailjet/mailjet-apiv3-go/v3 v3.2.0 h1:/gjowTurgK4iqLzVAQmjtcldyaW6tbJ
 github.com/mailjet/mailjet-apiv3-go/v3 v3.2.0/go.mod h1:Nw3mVzRxV0CVDTlzaRcADGKt4PMNbT7gYIyEtjMrVIM=
 github.com/mailjet/mailjet-apiv3-go/v4 v4.0.1 h1:VwdxYT1lPOIBZolqNtN6GcpdOySgHhCFQNsbN5P7uh8=
 github.com/mailjet/mailjet-apiv3-go/v4 v4.0.1/go.mod h1:2SU3t6eh/uK6BSeBmdhpIUau99L4iPlIfbx4o4pAUQs=
-github.com/mkmiller6/neon-go-client v0.0.0-20240714032011-18e112a0e9bb h1:627S4VQ0j8qKxTlQ+k66JPgxePLtyEcDUEBh4fkedxQ=
-github.com/mkmiller6/neon-go-client v0.0.0-20240714032011-18e112a0e9bb/go.mod h1:t+DoHBGTTc5fqxX1AqLoKO2JFGePefz3llsSkPk4xDE=
+github.com/mkmiller6/neon-go-client v0.0.0-20240714163722-496d15e76c05 h1:XIEf1qMjs6jgCpVyIN/wsAlxf9CplAy8eqAQjUv+tLA=
+github.com/mkmiller6/neon-go-client v0.0.0-20240714163722-496d15e76c05/go.mod h1:t+DoHBGTTc5fqxX1AqLoKO2JFGePefz3llsSkPk4xDE=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
