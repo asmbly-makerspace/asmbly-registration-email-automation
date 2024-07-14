@@ -16,11 +16,11 @@ func TestGetEventName(t *testing.T) {
 		EventsDB: []neonEvent{
 			{
 				Id:   7008,
-				Name: "Test Event",
+				Name: "Test Event w/ Test Teacher",
 			},
 			{
 				Id:   8001,
-				Name: "Test Event 2",
+				Name: "Test Event 2 w/ Another Teacher",
 			},
 		},
 	}
