@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -13,30 +14,48 @@ import (
 	"github.com/mkmiller6/neon-go-client/client"
 )
 
-func getNeonEventName(client *client.API, eventJson *EventBody, c chan<- string) {
+type AccountsInterface interface {
+	GetByID(int) (*neon.Account, error)
+}
+
+type EventsInterface interface {
+	GetByID(int) (*neon.Event, error)
+}
+
+func GetNeonEventName(client EventsInterface, eventJson *EventBody, c chan<- string, ec chan<- error) {
 
 	eventId, err := strconv.Atoi(eventJson.Data.EventID)
 	if err != nil {
-		log.Fatalf("parsing neon event id string failed with error: %q", err)
+		ec <- fmt.Errorf("parsing neon event id string failed with error: %q", err)
+		c <- ""
+		return
 	}
-	neonEvent, err := client.Events.GetByID(eventId)
+	neonEvent, err := client.GetByID(eventId)
 	if err != nil {
-		log.Fatalf("getting neon event failed with error: %q", err)
+		ec <- fmt.Errorf("getting neon event failed with error: %q", err)
+		c <- ""
+		return
 	}
 
+	ec <- nil
 	c <- strings.Split(neonEvent.Name, " w/")[0]
 }
 
-func getNeonAccountEmail(client *client.API, eventJson *EventBody, c chan<- string) {
+func GetNeonAccountEmail(client AccountsInterface, eventJson *EventBody, c chan<- string, ec chan<- error) {
 	neonAcctId, err := strconv.Atoi(eventJson.Data.RegistrantAccountID)
 	if err != nil {
-		log.Fatalf("parsing neon account id string failed with error: %q", err)
+		ec <- fmt.Errorf("parsing neon account id string failed with error: %q", err)
+		c <- ""
+		return
 	}
-	registrantAcct, err := client.Accounts.GetByID(neonAcctId)
+	registrantAcct, err := client.GetByID(neonAcctId)
 	if err != nil {
-		log.Fatalf("getting neon account failed with error: %q", err)
+		ec <- fmt.Errorf("getting neon account failed with error: %q", err)
+		c <- ""
+		return
 	}
 
+	ec <- nil
 	c <- registrantAcct.IndividualAccount.PrimaryContact.Email1
 }
 
@@ -59,14 +78,23 @@ func lambdaHandler(event Event) error {
 
 	eventChan := make(chan string)
 	acctChan := make(chan string)
+	errChan := make(chan error)
 
-	go getNeonEventName(neonClient, &eventJson, eventChan)
-	go getNeonAccountEmail(neonClient, &eventJson, acctChan)
+	go GetNeonEventName(neonClient.Events, &eventJson, eventChan, errChan)
+	err := <-errChan
+	if err != nil {
+		log.Fatal(err)
+	}
+	go GetNeonAccountEmail(neonClient.Accounts, &eventJson, acctChan, errChan)
+	err = <-errChan
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	neonEventName := <-eventChan
 	registrantEmail := <-acctChan
 
-	err := mailService.SendRegistrationEmail(
+	err = mailService.SendRegistrationEmail(
 		neonEventName,
 		registrantEmail,
 		eventJson.Data.Tickets[0].Attendees[0].FirstName,
