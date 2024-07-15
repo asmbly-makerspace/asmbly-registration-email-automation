@@ -37,6 +37,8 @@ func NewAsmblyRegistrationEmailAutomationStack(scope constructs.Construct, id st
 		"MJ_APIKEY_PUBLIC":  jsii.String(os.Getenv("MJ_APIKEY_PUBLIC")),
 		"NEON_APIKEY":       jsii.String(os.Getenv("NEON_APIKEY")),
 		"NEON_APIUSER":      jsii.String(os.Getenv("NEON_APIUSER")),
+		"DEV":               jsii.String(os.Getenv("DEV")),
+		"TEST_EMAIL":        jsii.String(os.Getenv("TEST_EMAIL")),
 	}
 
 	// The code that defines your stack goes here

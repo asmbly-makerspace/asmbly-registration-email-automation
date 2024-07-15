@@ -76,18 +76,13 @@ func lambdaHandler(event Event) error {
 	var eventJson EventBody
 	json.Unmarshal([]byte(event.Body), &eventJson)
 
-	eventChan := make(chan string)
-	acctChan := make(chan string)
-	errChan := make(chan error)
+	eventChan := make(chan string, 1)
+	acctChan := make(chan string, 1)
+	errChan := make(chan error, 1)
 
 	go GetNeonEventName(neonClient.Events, &eventJson, eventChan, errChan)
-	err := <-errChan
-	if err != nil {
-		log.Fatal(err)
-	}
 	go GetNeonAccountEmail(neonClient.Accounts, &eventJson, acctChan, errChan)
-	err = <-errChan
-	if err != nil {
+	if err := <-errChan; err != nil {
 		log.Fatal(err)
 	}
 
@@ -98,7 +93,7 @@ func lambdaHandler(event Event) error {
 		return nil
 	}
 
-	err = mailService.SendRegistrationEmail(
+	err := mailService.SendRegistrationEmail(
 		neonEventName,
 		registrantEmail,
 		eventJson.Data.Tickets[0].Attendees[0].FirstName,

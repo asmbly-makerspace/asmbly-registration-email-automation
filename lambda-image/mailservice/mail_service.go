@@ -49,7 +49,7 @@ func (c *Client) SendRegistrationEmail(className, email, firstName string) error
 		To:         []string{email},
 		TemplateID: templateID,
 		Variables: map[string]interface{}{
-			"firstname":  firstName,
+			"first_name": firstName,
 			"class_name": className,
 		},
 	}
