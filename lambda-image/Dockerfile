@@ -1,12 +1,14 @@
-FROM golang:1.22.4-alpine3.20 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.22.4-alpine3.20 AS builder
 WORKDIR /
 
 # Disable cgo to create a static binary.
 ENV CGO_ENABLED="0"
 
 # Compile for arm64 Linux
-ENV GOOS="linux"
-ENV GOARCH="arm64"
+ARG TARGETOS
+ARG TARGETARCH
+ENV GOOS=$TARGETOS
+ENV GOARCH=$TARGETARCH
 
 # Update CA Certs
 RUN apk --update add ca-certificates
@@ -17,7 +19,7 @@ ADD ./mailservice ./mailservice
 RUN go mod download
 
 # Build
-RUN go build -a -o app
+RUN go build -a -tags lambda.norpc -o app
 
 # Copy artifacts to a clean image
 FROM scratch

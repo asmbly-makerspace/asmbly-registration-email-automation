@@ -18,8 +18,15 @@
 .cdk.staging
 cdk.out
 
+# AWS SAM files
+.aws-sam
+
 # .env file
 .env
+
+# Integration testing env variables and event files
+locals.json
+events
 
 # example json data
 *_example.json
