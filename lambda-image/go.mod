@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-lambda-go v1.47.0
 	github.com/mailjet/mailjet-apiv3-go/v3 v3.2.0
 	github.com/mailjet/mailjet-apiv3-go/v4 v4.0.1
-	github.com/mkmiller6/neon-go-client v0.0.0-20240714221728-cffa17ffd7fe
+	github.com/mkmiller6/neon-go-client v0.0.0-20240716193530-8ed6d85c3d46
 )
 
 require (

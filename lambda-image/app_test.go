@@ -31,16 +31,15 @@ func TestGetEventName(t *testing.T) {
 			},
 		}
 
-		c := make(chan string)
-		ec := make(chan error)
+		c := make(chan app.NeonResult)
 
-		go app.GetNeonEventName(client, json, c, ec)
-		err := <-ec
-		if err != nil {
-			t.Fatalf("error finding event in database: %q", err)
+		go app.GetNeonEventName(client, json, c)
+		result := <-c
+		if result.Error != nil {
+			t.Fatalf("error finding event in database: %q", result.Error)
 		}
 
-		got := <-c
+		got := result.Response
 		want := "Test Event"
 
 		if got != want {
@@ -54,18 +53,17 @@ func TestGetEventName(t *testing.T) {
 			},
 		}
 
-		c := make(chan string)
-		ec := make(chan error)
+		c := make(chan app.NeonResult)
 
-		go app.GetNeonEventName(client, json, c, ec)
-		err := <-ec
-		if err == nil {
+		go app.GetNeonEventName(client, json, c)
+		result := <-c
+		if result.Error == nil {
 			t.Fatal("expected an error but didn't get one")
 		}
 		expectedError := fmt.Sprintf("getting neon event failed with error: %q", ErrEventNotFound)
-		assert.EqualErrorf(t, err, expectedError, "Error should be: %v, got: %v", expectedError, err)
+		assert.EqualErrorf(t, result.Error, expectedError, "Error should be: %v, got: %v", expectedError, result.Error)
 
-		got := <-c
+		got := result.Response
 		want := ""
 
 		if got != want {
@@ -101,16 +99,15 @@ func TestGetAccountEmail(t *testing.T) {
 			},
 		}
 
-		c := make(chan string)
-		ec := make(chan error)
+		c := make(chan app.NeonResult)
 
-		go app.GetNeonAccountEmail(client, json, c, ec)
-		err := <-ec
-		if err != nil {
-			t.Fatalf("error finding acct in database: %q", err)
+		go app.GetNeonAccountEmail(client, json, c)
+		result := <-c
+		if result.Error != nil {
+			t.Fatalf("error finding acct in database: %q", result.Error)
 		}
 
-		got := <-c
+		got := result.Response
 		want := "testemail@example.com"
 
 		if got != want {
@@ -124,18 +121,17 @@ func TestGetAccountEmail(t *testing.T) {
 			},
 		}
 
-		c := make(chan string)
-		ec := make(chan error)
+		c := make(chan app.NeonResult)
 
-		go app.GetNeonAccountEmail(client, json, c, ec)
-		err := <-ec
-		if err == nil {
+		go app.GetNeonAccountEmail(client, json, c)
+		result := <-c
+		if result.Error == nil {
 			t.Fatal("expected an error but didn't get one")
 		}
 		expectedError := fmt.Sprintf("getting neon account failed with error: %q", ErrAcctNotFound)
-		assert.EqualErrorf(t, err, expectedError, "Error should be: %v, got: %v", expectedError, err)
+		assert.EqualErrorf(t, result.Error, expectedError, "Error should be: %v, got: %v", expectedError, result.Error)
 
-		got := <-c
+		got := result.Response
 		want := ""
 
 		if got != want {
