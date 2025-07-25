@@ -12,7 +12,7 @@ var ErrNotFound = errors.New("couldn't find any templates with that name")
 var ErrMultipleFound = errors.New("found more than one template with that name")
 
 const EmailSubject = "Information about your upcoming class at Asmbly"
-const FromEmail = "membership@asmbly.org"
+const FromEmail = "classes@asmbly.org"
 const FromName = "Asmbly Education Team"
 
 type MJCredentials struct {
